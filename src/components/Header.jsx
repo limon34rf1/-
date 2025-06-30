@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import './Header.css'; // Создадим этот файл позже
+import './Header.css';
 
 const days = [
   { id: 'monday', name: 'ПН' },
@@ -15,6 +15,15 @@ const days = [
 export default function Header({ currentDay, setCurrentDay }) {
   return (
     <header className="header">
+      <motion.h1 
+        className="app-title"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        Бобр-Планировщик
+      </motion.h1>
+      
       <nav>
         <ul className="days-list">
           {days.map(day => (
