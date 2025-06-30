@@ -1,0 +1,14 @@
+@font-face {
+  font-family: 'Soyuz Grotesk';
+  src: 
+    url('/assets/fonts/Soyuz-Grotesk-Bold.otf') format('otf'),
+    url('/assets/fonts/Soyuz-Grotesk-Bold.woff') format('woff');
+  font-weight: 700;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Soyuz Grotesk', sans-serif;
+  background: white;
+  color: black;
+}
