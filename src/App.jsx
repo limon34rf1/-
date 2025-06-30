@@ -59,4 +59,123 @@ const schedule = {
     { time: '13:45-14:30', task: 'обед', intensity: 'normal' },
     { time: '14:30-16:30', task: 'анализ данных: углублённая практика', intensity: 'normal' },
     { time: '17:00-18:30', task: 'Python: алгоритмы', intensity: 'hard' },
-    { time: '18:30-19:00', task: 'тренировка', intensity: 'nor
+    { time: '18:30-19:00', task: 'тренировка', intensity: 'normal' },
+    { time: '19:00-19:45', task: 'ужин', intensity: 'normal' },
+    { time: '19:45-21:30', task: 'статистика: сложные темы', intensity: 'hard' },
+    { time: '22:00-23:30', task: 'олимпиадные задачи', intensity: 'hard' },
+    { time: '23:30-00:00', task: 'отдых', intensity: 'normal' },
+    { time: '00:00-01:00', task: 'сон', intensity: 'normal' }
+  ],
+  friday: [
+    { time: '09:00-09:30', task: 'зарядка', intensity: 'normal' },
+    { time: '09:30-10:00', task: 'завтрак', intensity: 'normal' },
+    { time: '10:00-12:00', task: 'олимпиадная математика', intensity: 'hard' },
+    { time: '12:15-13:45', task: 'физика: разбор ошибок', intensity: 'normal' },
+    { time: '13:45-14:30', task: 'обед', intensity: 'normal' },
+    { time: '14:30-16:30', task: 'анализ данных, проект "Большие вызовы"', intensity: 'normal' },
+    { time: '17:00-18:30', task: 'Python/алгоритмы', intensity: 'hard' },
+    { time: '18:30-19:00', task: 'тренировка', intensity: 'normal' },
+    { time: '19:00-19:45', task: 'ужин', intensity: 'normal' },
+    { time: '19:45-21:30', task: 'итоговая практика за неделю', intensity: 'hard' },
+    { time: '22:00-23:30', task: 'отдых, общение', intensity: 'normal' },
+    { time: '23:30-00:00', task: 'отдых', intensity: 'normal' },
+    { time: '00:00-01:00', task: 'сон', intensity: 'normal' }
+  ],
+  saturday: [
+    { time: '09:00-09:30', task: 'зарядка', intensity: 'normal' },
+    { time: '09:30-10:00', task: 'завтрак', intensity: 'normal' },
+    { time: '10:00-12:00', task: 'олимпиадная математика', intensity: 'hard' },
+    { time: '12:15-13:45', task: 'олимпиадная информатика', intensity: 'hard' },
+    { time: '13:45-14:30', task: 'обед', intensity: 'normal' },
+    { time: '14:30-16:30', task: 'анализ данных', intensity: 'normal' },
+    { time: '17:00-18:30', task: 'проект по статистике', intensity: 'normal' },
+    { time: '18:30-19:00', task: 'тренировка', intensity: 'normal' },
+    { time: '19:00-19:45', task: 'ужин', intensity: 'normal' },
+    { time: '19:45-21:30', task: 'практика олимпиадных задач', intensity: 'hard' },
+    { time: '22:00-00:00', task: 'отдых', intensity: 'normal' },
+    { time: '00:00-01:00', task: 'сон', intensity: 'normal' }
+  ],
+  sunday: [
+    { time: '09:00-09:30', task: 'зарядка', intensity: 'normal' },
+    { time: '09:30-10:00', task: 'завтрак', intensity: 'normal' },
+    { time: '10:00-12:00', task: 'лёгкая практика по интересной теме', intensity: 'light' },
+    { time: '12:15-13:45', task: 'прогулка, хобби', intensity: 'normal' },
+    { time: '13:45-14:30', task: 'обед', intensity: 'normal' },
+    { time: '14:30-16:30', task: 'свободное время', intensity: 'light' },
+    { time: '17:00-18:30', task: 'обзор материалов за неделю', intensity: 'normal' },
+    { time: '18:30-19:00', task: 'тренировка', intensity: 'normal' },
+    { time: '19:00-19:45', task: 'ужин', intensity: 'normal' },
+    { time: '19:45-21:30', task: 'лёгкая олимпиадная практика или отдых', intensity: 'light' },
+    { time: '22:00-00:00', task: 'отдых', intensity: 'normal' },
+    { time: '00:00-01:00', task: 'сон', intensity: 'normal' }
+  ]
+};
+
+export default function App() {
+  const [currentDay, setCurrentDay] = useState('monday');
+  const [currentTime, setCurrentTime] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const timelineRef = useRef();
+
+  // Определяем московское время и текущий день
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const moscowTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));
+      setCurrentTime(moscowTime);
+      
+      const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      setCurrentDay(days[moscowTime.getDay()]);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Автоскролл к текущему блоку
+  useEffect(() => {
+    if (!currentTime || !timelineRef.current) return;
+
+    const currentHour = currentTime.getHours();
+    const currentMinute = currentTime.getMinutes();
+    const currentBlocks = schedule[currentDay];
+
+    for (let i = 0; i < currentBlocks.length; i++) {
+      const [start, end] = currentBlocks[i].time.split('-').map(t => {
+        const [h, m] = t.split(':').map(Number);
+        return h + m / 60;
+      });
+
+      if (currentHour + currentMinute/60 < end) {
+        setActiveIndex(i);
+        timelineRef.current.children[i]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        break;
+      }
+    }
+  }, [currentDay, currentTime]);
+
+  return (
+    <div className="app">
+      <Header currentDay={currentDay} setCurrentDay={setCurrentDay} />
+      
+      <div className="timeline-container" ref={timelineRef}>
+        <AnimatePresence mode="wait">
+          <Timeline 
+            key={currentDay}
+            day={currentDay} 
+            schedule={schedule[currentDay]} 
+            activeIndex={activeIndex}
+          />
+        </AnimatePresence>
+      </div>
+
+      <Beaver 
+        currentTask={schedule[currentDay]?.[activeIndex]?.task} 
+        currentTime={currentTime}
+      />
+
+      <Footer />
+    </div>
+  );
+}
